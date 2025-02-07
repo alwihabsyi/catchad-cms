@@ -1,21 +1,16 @@
 @extends('layout')
 
 @section('content')
-    <div>
-        <h1 class="text-2xl font-bold mt-4">Device Log</h1>
-        <div
-            class="w-full h-64 bg-gray-50 shadow text-sm text-gray-500 font-mono p-4 rounded-lg shadow-md overflow-y-auto mt-2">
-            <div id="logContainer" class="space-y-2">
-                @forelse($logs as $log)
-                    <p>{{ \Carbon\Carbon::parse($log->created_at)->format('d M Y H:i:s') }} - {{ $log->log_message }}</p>
-                @empty
-                    <p class="text-gray-500">No logs available.</p>
-                @endforelse
+    <div class="px-4">
+        <a href="{{ route('logs.show', $device->id) }}">
+            <div class="w-full rounded-2xl overflow-hidden shadow-md mb-4 bg-gray-100 px-6 py-4 flex items-center gap-3 mt-6">
+                <i class="fas fa-clipboard text-xl"></i>
+                <h2 class="font-bold text-xl">Device Report</h2>
             </div>
-        </div>
+        </a>
 
-        <div class="h-[80vh] flex flex-row justify-between gap-5 my-4">
-            <div class="w-1/2 flex flex-col justify-between rounded-2xl shadow-md p-4 bg-gray-50">
+        <div class="h-auto sm:h-[80vh] flex flex-col sm:flex-row justify-between gap-5 my-5">
+            <div class="w-full sm:w-1/2 flex flex-col justify-between rounded-2xl shadow-md p-4 bg-gray-50">
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-2xl font-bold">BLE Devices</h1>
@@ -26,7 +21,7 @@
                     </div>
                 </div>
 
-                <div class="h-[65vh] overflow-y-auto">
+                <div class="mt-3 h-[35vh] sm:h-[65vh] overflow-y-auto">
                     @if ($bluetooth->isEmpty())
                         <div class="h-full flex items-center justify-center">
                             <p class="text-center text-gray-500">No Bluetooth Devices</p>
@@ -43,7 +38,7 @@
                     @endif
                 </div>
             </div>
-            <div class="w-1/2 flex flex-col justify-between rounded-2xl shadow-md p-4 bg-gray-50">
+            <div class="w-full sm:w-1/2 flex flex-col justify-between rounded-2xl shadow-md p-4 bg-gray-50">
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-2xl font-bold">WiFi Devices</h1>
@@ -54,7 +49,7 @@
                     </div>
                 </div>
 
-                <div class="h-[65vh] overflow-y-auto">
+                <div class="mt-3 h-[35vh] sm:h-[65vh] overflow-y-auto">
                     @if ($wifi->isEmpty())
                         <div class="h-full flex items-center justify-center">
                             <p class="text-center text-gray-500">No WiFi Devices</p>

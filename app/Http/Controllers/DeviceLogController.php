@@ -7,6 +7,16 @@ use App\Models\DeviceLog;
 
 class DeviceLogController extends Controller
 {
+    public function index($deviceId)
+    {
+        $logs = DeviceLog::where('device_id', $deviceId)
+            ->latest()
+            ->take(300)
+            ->get();
+
+        return view('logs.index', compact('logs'));
+    }
+
     public function store(Request $request)
     {
         try {

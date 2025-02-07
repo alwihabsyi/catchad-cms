@@ -22,12 +22,12 @@
         @endif
     </head>
     <body class="font-sans antialiased">
-        <nav class="bg-gray-800 p-4 text-white">
+        <nav class="fixed top-0 left-0 w-full z-40 bg-background shadow-header bg-gray-800 p-4 text-white">
             <div class="container mx-auto flex justify-center items-center">
                 <a href="#" class="text-lg font-bold">CatchAd</a>
             </div>
         </nav>
-        <div class="container mx-auto py-2">
+        <div class="container mx-auto mt-16 py-2">
             @yield('content')
         </div>
     </body>

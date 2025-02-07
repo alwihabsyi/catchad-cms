@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('content')
-    <div class="mt-4">
+    <div class="px-4 mt-4">
         <div class="flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-bold">Devices</h1>
@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <div class="mt-5 items-center h-[80vh] overflow-y-auto">
+        <div class="mt-5 items-center h-auto sm:h-[80vh] overflow-y-auto">
             @if ($devices->isEmpty())
                 <div class="h-full flex items-center justify-center">
                     <p class="text-center text-gray-500">No Devices</p>
