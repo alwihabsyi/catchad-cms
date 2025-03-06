@@ -117,7 +117,12 @@ class WifiController extends Controller
 
     public function getWiFiData(Request $request)
     {
-        $query = Wifi::with('device');
+        $sortColumn = $request->input('sort_column', 'updated_at');
+        $sortOrder = $request->input('sort_order', 'asc');
+
+        $query = Wifi::with('device')
+            ->leftJoin('devices', 'devices.id', '=', 'wifi.device_id')
+            ->select('wifi.*', 'devices.name as device_name', 'devices.manufacturer as device_manufacturer', 'devices.brand as device_manufacturer');;
 
         if ($request->device_name) {
             $query->whereHas('device', function ($q) use ($request) {
@@ -139,14 +144,22 @@ class WifiController extends Controller
             $search = $request->search_query;
             $query->where(function ($q) use ($search) {
                 $q->where('ssid', 'like', "%$search%")
-                  ->orWhere('bssid', 'like', "%$search%")
-                  ->orWhere('frequency', 'like', "%$search%")
-                  ->orWhere('rssi', 'like', "%$search%")
-                  ->orWhereHas('device', function ($q) use ($search) {
-                      $q->where('name', 'like', "%$search%")
-                        ->orWhere('manufacturer', 'like', "%$search%");
-                  });
+                    ->orWhere('bssid', 'like', "%$search%")
+                    ->orWhere('frequency', 'like', "%$search%")
+                    ->orWhere('rssi', 'like', "%$search%")
+                    ->orWhereHas('device', function ($q) use ($search) {
+                        $q->where('name', 'like', "%$search%")
+                            ->orWhere('manufacturer', 'like', "%$search%");
+                    });
             });
+        }
+
+        if (in_array($sortColumn, ['bssid', 'ssid', 'frequency', 'rssi', 'updated_at', 'created_at'])) {
+            $query->orderBy("wifi.$sortColumn", $sortOrder);
+        } elseif (in_array($sortColumn, ['device_name', 'device_manufacturer', 'device_brand'])) {
+            $query->orderBy($sortColumn, $sortOrder);
+        } else {
+            $query->orderBy('wifi.updated_at', 'asc');
         }
 
         $perPage = $request->per_page ?? 5;

@@ -117,6 +117,9 @@ class BluetoothController extends Controller
 
     public function getBluetoothData(Request $request)
     {
+        $sortColumn = $request->input('sort_column', 'updated_at');
+        $sortOrder = $request->input('sort_order', 'asc');
+
         $query = Bluetooth::with('device');
 
         if ($request->device_name) {
@@ -135,14 +138,22 @@ class BluetoothController extends Controller
             $search = $request->search_query;
             $query->where(function ($q) use ($search) {
                 $q->where('address', 'like', "%$search%")
-                  ->orWhere('name', 'like', "%$search%")
-                  ->orWhere('manufacturer', 'like', "%$search%")
-                  ->orWhere('rssi', 'like', "%$search%")
-                  ->orWhereHas('device', function ($q) use ($search) {
-                      $q->where('name', 'like', "%$search%")
-                        ->orWhere('manufacturer', 'like', "%$search%");
-                  });
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('manufacturer', 'like', "%$search%")
+                    ->orWhere('rssi', 'like', "%$search%")
+                    ->orWhereHas('device', function ($q) use ($search) {
+                        $q->where('name', 'like', "%$search%")
+                            ->orWhere('manufacturer', 'like', "%$search%");
+                    });
             });
+        }
+
+        if (in_array($sortColumn, ['address', 'name', 'manufacturer', 'rssi', 'updated_at', 'created_at'])) {
+            $query->orderBy("bluetooth.$sortColumn", $sortOrder);
+        } elseif (in_array($sortColumn, ['device_name', 'device_manufacturer', 'device_brand'])) {
+            $query->orderBy($sortColumn, $sortOrder);
+        } else {
+            $query->orderBy('bluetooth.updated_at', 'asc');
         }
 
         $perPage = $request->per_page ?? 5;

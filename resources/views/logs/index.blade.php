@@ -34,14 +34,22 @@
             <table class="w-full bg-white shadow-md rounded-lg mb-6">
                 <thead>
                     <tr class="bg-gray-800 text-white text-center">
-                        <th class="px-5 py-3">Device Name</th>
-                        <th class="px-5 py-3">Manufacturer</th>
-                        <th class="px-5 py-3">Brand</th>
-                        <th class="px-5 py-3">BSSID</th>
-                        <th class="px-5 py-3">SSID</th>
-                        <th class="px-5 py-3">RSSI</th>
-                        <th class="px-5 py-3">Frequency</th>
-                        <th class="px-5 py-3">Time</th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="device_name" data-order="asc">Device
+                            Name <span class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="device_manufacturer" data-order="asc">
+                            Manufacturer <span class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="brand" data-order="asc">Brand <span
+                                class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="bssid" data-order="asc">BSSID <span
+                                class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="ssid" data-order="asc">SSID <span
+                                class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="rssi" data-order="asc">RSSI <span
+                                class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="frequency" data-order="asc">Frequency
+                            <span class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="updated_at" data-order="asc">Time
+                            <span class="sort-icon">⬍</span></th>
                     </tr>
                 </thead>
                 <tbody id="wifiTableBody" class="divide-y divide-gray-200"></tbody>
@@ -80,13 +88,21 @@
             <table class="w-full bg-white">
                 <thead>
                     <tr class="bg-gray-800 text-white text-center">
-                        <th class="px-5 py-3">Device Name</th>
-                        <th class="px-5 py-3">Manufacturer</th>
-                        <th class="px-5 py-3">Brand</th>
-                        <th class="px-5 py-3">MAC Address</th>
-                        <th class="px-5 py-3">Transmitter Name</th>
-                        <th class="px-5 py-3">RSSI</th>
-                        <th class="px-5 py-3">Time</th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="device_name" data-order="asc">Device
+                            Name <span class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="device_manufacturer" data-order="asc">
+                            Manufacturer <span class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="device_brand" data-order="asc">Brand
+                            <span class="sort-icon">⬍</span>
+                        </th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="address" data-order="asc">MAC Address
+                            <span class="sort-icon">⬍</span>
+                        </th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="name" data-order="asc">Transmitter Name <span class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="rssi" data-order="asc">RSSI <span
+                                class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="updated_at" data-order="asc">Time
+                            <span class="sort-icon">⬍</span></th>
                     </tr>
                 </thead>
                 <tbody id="bluetoothTableBody" class="divide-y divide-gray-200"></tbody>
@@ -135,7 +151,7 @@
                 });
             }
 
-            function loadTable(type, page) {
+            function loadTable(type, page, sortColumn = 'updated_at', sortOrder = 'asc') {
                 let url = type === 'wifi' ? "{{ route('wifi.data') }}" : "{{ route('bluetooth.data') }}";
                 let tableBody = type === 'wifi' ? "#wifiTableBody" : "#bluetoothTableBody";
                 let pageInfo = type === 'wifi' ? "#wifiPageInfo" : "#bluetoothPageInfo";
@@ -149,7 +165,9 @@
                     search_query: type === 'wifi' ? $('#wifiSearch').val() : $('#bluetoothSearch').val(),
                     ssid: type === 'wifi' ? $('#wifiSSID').val() : '',
                     page: page,
-                    per_page: perPage
+                    per_page: perPage,
+                    sort_column: sortColumn,
+                    sort_order: sortOrder
                 };
 
                 $.ajax({
@@ -158,7 +176,7 @@
                     data: filters,
                     success: function(response) {
                         let rows = response.data.length ? response.data.map(item => {
-                            return type === 'wifi' ? `
+                                return type === 'wifi' ? `
                     <tr class="text-center">
                         <td class="px-5 py-3">${item.device?.name || '-'}</td>
                         <td class="px-5 py-3">${item.device?.manufacturer || '-'}</td>
@@ -178,7 +196,8 @@
                         <td class="px-5 py-3">${item.rssi || '-'}</td>
                         <td class="px-5 py-3">${item.updated_at || '-'}</td>
                     </tr>`;
-                        }).join('') : `<tr><td colspan="8" class="text-center h-24 text-gray-500">No data available</td></tr>`;
+                            }).join('') :
+                            `<tr><td colspan="8" class="text-center h-24 text-gray-500">No data available</td></tr>`;
 
                         $(tableBody).html(rows);
                         $(pageInfo).text(`Page ${page} of ${response.total_pages}`);
@@ -187,6 +206,27 @@
                     }
                 });
             }
+
+            $('.sort-column').click(function() {
+                let column = $(this).data('column');
+                let order = $(this).data('order') === 'asc' ? 'desc' : 'asc';
+                let icon = this.querySelector('.sort-icon');
+                $(this).data('order', order);
+
+                let isWiFi = $(this).closest('table').find('#wifiTableBody').length > 0;
+                let type = isWiFi ? 'wifi' : 'bluetooth';
+
+                if (!column) {
+                    console.error("Invalid column for sorting");
+                    return;
+                }
+
+                console.log(`Sorting ${type} by ${column} in ${order} order`);
+
+                document.querySelectorAll('.sort-icon').forEach(el => el.textContent = "⬍");
+                icon.textContent = order === "desc" ? "⬆" : "⬇";
+                loadTable(type, type === 'wifi' ? wifiPage : bluetoothPage, column, order);
+            });
 
 
             fetchFilters();
