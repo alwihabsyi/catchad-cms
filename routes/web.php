@@ -13,4 +13,5 @@ Route::post('/delete-devices', [DevicesController::class, 'deleteAll']);
 Route::post('/delete-bluetooth', [BluetoothController::class, 'deleteAll']);
 Route::post('/delete-wifi', [WifiController::class, 'deleteAll']);
 
-Route::get('/logs/{device_id}', [DeviceLogController::class, 'index'])->name('logs.show');
+Route::get('/logs/{device_id}', [DeviceLogController::class, 'show'])->name('logs.show');
+Route::get('/logs', [DeviceLogController::class, 'index'])->name('logs');

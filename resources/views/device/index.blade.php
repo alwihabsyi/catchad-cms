@@ -2,7 +2,14 @@
 
 @section('content')
     <div class="px-4 mt-4">
-        <div class="flex justify-between items-center">
+        <a href="{{ route('logs') }}">
+            <div class="w-full rounded-2xl overflow-hidden shadow-md mb-4 bg-gray-100 px-6 py-4 flex items-center gap-3 mt-6">
+                <i class="fas fa-clipboard text-xl"></i>
+                <h2 class="font-bold text-xl">Devices Transmitter Data</h2>
+            </div>
+        </a>
+
+        <div class="flex justify-between items-center mt-12">
             <div>
                 <h1 class="text-2xl font-bold">Devices</h1>
                 <p>List of CatchAd devices.</p>

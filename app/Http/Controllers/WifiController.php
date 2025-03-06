@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Wifi;
+use Yajra\DataTables\Facades\DataTables;
 
 class WifiController extends Controller
 {
@@ -31,7 +32,7 @@ class WifiController extends Controller
 
             $wifi = Wifi::create([
                 'bssid' => $validated['bssid'],
-                'ssid' => $validated['ssid'],
+                'ssid' => $validated['ssid'] ?? 'unknown',
                 'frequency' => $validated['frequency'],
                 'rssi' => $validated['rssi'],
                 'device_id' => $validated['device_id'],
@@ -112,5 +113,75 @@ class WifiController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
+    }
+
+    public function getWiFiData(Request $request)
+    {
+        $query = Wifi::with('device');
+
+        if ($request->device_name) {
+            $query->whereHas('device', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->device_name . '%');
+            });
+        }
+
+        if ($request->manufacturer) {
+            $query->whereHas('device', function ($q) use ($request) {
+                $q->where('manufacturer', 'like', '%' . $request->manufacturer . '%');
+            });
+        }
+
+        if ($request->ssid) {
+            $query->where('ssid', 'like', '%' . $request->ssid . '%');
+        }
+
+        if ($request->search_query) {
+            $search = $request->search_query;
+            $query->where(function ($q) use ($search) {
+                $q->where('ssid', 'like', "%$search%")
+                  ->orWhere('bssid', 'like', "%$search%")
+                  ->orWhere('frequency', 'like', "%$search%")
+                  ->orWhere('rssi', 'like', "%$search%")
+                  ->orWhereHas('device', function ($q) use ($search) {
+                      $q->where('name', 'like', "%$search%")
+                        ->orWhere('manufacturer', 'like', "%$search%");
+                  });
+            });
+        }
+
+        $perPage = $request->per_page ?? 5;
+        $data = $query->paginate($perPage);
+
+        $formattedData = collect($data->items())->map(function ($item) {
+            return [
+                'bssid' => $item->bssid,
+                'ssid' => $item->ssid,
+                'frequency' => $item->frequency,
+                'rssi' => $item->rssi,
+                'device_id' => $item->device_id,
+                'device' => $item->device,
+                'created_at' => $item->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $item->updated_at->format('Y-m-d H:i:s'),
+            ];
+        });
+
+        return response()->json([
+            'data' => $formattedData,
+            'total_pages' => $data->lastPage(),
+            'current_page' => $data->currentPage()
+        ]);
+    }
+
+    public function getWiFiFilters()
+    {
+        $devices = Wifi::with('device')->get()->pluck('device.name')->unique()->values();
+        $manufacturers = Wifi::with('device')->get()->pluck('device.manufacturer')->unique()->values();
+        $ssid = Wifi::with('device')->get()->pluck('ssid')->unique()->values();
+
+        return response()->json([
+            'devices' => $devices,
+            'manufacturers' => $manufacturers,
+            'ssid' => $ssid
+        ]);
     }
 }

@@ -4,17 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\DeviceLog;
+use Yajra\DataTables\Facades\DataTables;
 
 class DeviceLogController extends Controller
 {
-    public function index($deviceId)
+    public function index()
+    {
+        return view('logs.index');
+    }
+
+    public function show($deviceId)
     {
         $logs = DeviceLog::where('device_id', $deviceId)
             ->latest()
             ->take(300)
             ->get();
 
-        return view('logs.index', compact('logs'));
+        return view('logs.show', compact('logs'));
     }
 
     public function store(Request $request)

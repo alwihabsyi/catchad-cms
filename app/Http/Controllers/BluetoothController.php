@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Bluetooth;
+use Yajra\DataTables\Facades\DataTables;
 
 class BluetoothController extends Controller
 {
@@ -112,5 +113,69 @@ class BluetoothController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
+    }
+
+    public function getBluetoothData(Request $request)
+    {
+        $query = Bluetooth::with('device');
+
+        if ($request->device_name) {
+            $query->whereHas('device', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->device_name . '%');
+            });
+        }
+
+        if ($request->manufacturer) {
+            $query->whereHas('device', function ($q) use ($request) {
+                $q->where('manufacturer', 'like', '%' . $request->manufacturer . '%');
+            });
+        }
+
+        if ($request->search_query) {
+            $search = $request->search_query;
+            $query->where(function ($q) use ($search) {
+                $q->where('address', 'like', "%$search%")
+                  ->orWhere('name', 'like', "%$search%")
+                  ->orWhere('manufacturer', 'like', "%$search%")
+                  ->orWhere('rssi', 'like', "%$search%")
+                  ->orWhereHas('device', function ($q) use ($search) {
+                      $q->where('name', 'like', "%$search%")
+                        ->orWhere('manufacturer', 'like', "%$search%");
+                  });
+            });
+        }
+
+        $perPage = $request->per_page ?? 5;
+        $data = $query->paginate($perPage);
+
+        $formattedData = collect($data->items())->map(function ($item) {
+            return [
+                'address' => $item->address,
+                'name' => $item->name,
+                'manufacturer' => $item->manufacturer,
+                'rssi' => $item->rssi,
+                'device_id' => $item->device_id,
+                'device' => $item->device,
+                'created_at' => $item->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $item->updated_at->format('Y-m-d H:i:s'),
+            ];
+        });
+
+        return response()->json([
+            'data' => $formattedData,
+            'total_pages' => $data->lastPage(),
+            'current_page' => $data->currentPage()
+        ]);
+    }
+
+    public function getBluetoothFilters()
+    {
+        $devices = Bluetooth::with('device')->get()->pluck('device.name')->unique()->values();
+        $manufacturers = Bluetooth::with('device')->get()->pluck('device.manufacturer')->unique()->values();
+
+        return response()->json([
+            'devices' => $devices,
+            'manufacturers' => $manufacturers,
+        ]);
     }
 }
