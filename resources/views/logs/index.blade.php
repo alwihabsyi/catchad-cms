@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="px-6 py-4 mb-12">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800">Devices WiFi & Bluetooth Data</h1>
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">Transmitter Data</h1>
 
         {{-- WiFi Filters --}}
         <h2 class="text-xl font-semibold mb-2 text-gray-700">WiFi Transmitters</h2>
