@@ -47,9 +47,11 @@
                         <th class="px-5 py-3 cursor-pointer sort-column" data-column="rssi" data-order="asc">RSSI <span
                                 class="sort-icon">⬍</span></th>
                         <th class="px-5 py-3 cursor-pointer sort-column" data-column="frequency" data-order="asc">Frequency
-                            <span class="sort-icon">⬍</span></th>
+                            <span class="sort-icon">⬍</span>
+                        </th>
                         <th class="px-5 py-3 cursor-pointer sort-column" data-column="updated_at" data-order="asc">Time
-                            <span class="sort-icon">⬍</span></th>
+                            <span class="sort-icon">⬍</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="wifiTableBody" class="divide-y divide-gray-200"></tbody>
@@ -98,11 +100,13 @@
                         <th class="px-5 py-3 cursor-pointer sort-column" data-column="address" data-order="asc">MAC Address
                             <span class="sort-icon">⬍</span>
                         </th>
-                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="name" data-order="asc">Transmitter Name <span class="sort-icon">⬍</span></th>
+                        <th class="px-5 py-3 cursor-pointer sort-column" data-column="name" data-order="asc">Transmitter
+                            Name <span class="sort-icon">⬍</span></th>
                         <th class="px-5 py-3 cursor-pointer sort-column" data-column="rssi" data-order="asc">RSSI <span
                                 class="sort-icon">⬍</span></th>
                         <th class="px-5 py-3 cursor-pointer sort-column" data-column="updated_at" data-order="asc">Time
-                            <span class="sort-icon">⬍</span></th>
+                            <span class="sort-icon">⬍</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="bluetoothTableBody" class="divide-y divide-gray-200"></tbody>
@@ -124,10 +128,9 @@
             let bluetoothPage = 1;
             const perPage = 5;
 
-
             function fetchFilters() {
                 $.ajax({
-                    url: "{{ route('wifi.filters') }}",
+                    url: "/api/wifi/filters",
                     type: 'GET',
                     success: function(data) {
                         $('#wifiDeviceName').append(data.devices.map(d =>
@@ -140,7 +143,7 @@
                 });
 
                 $.ajax({
-                    url: "{{ route('bluetooth.filters') }}",
+                    url: "/api/bluetooth/filters",
                     type: 'GET',
                     success: function(data) {
                         $('#bluetoothDeviceName').append(data.devices.map(d =>
@@ -151,8 +154,13 @@
                 });
             }
 
-            function loadTable(type, page, sortColumn = 'updated_at', sortOrder = 'asc') {
-                let url = type === 'wifi' ? "{{ route('wifi.data') }}" : "{{ route('bluetooth.data') }}";
+            function loadTable(type, page, sortColumn = 'updated_at', sortOrder = 'asc', icon = null) {
+                document.querySelectorAll('.sort-icon').forEach(el => el.textContent = "⬍");
+                if (icon) {
+                    icon.textContent = sortOrder === "desc" ? "⬆" : "⬇";
+                }
+
+                let url = type === 'wifi' ? "/api/wifi/data" : "/api/bluetooth/data";
                 let tableBody = type === 'wifi' ? "#wifiTableBody" : "#bluetoothTableBody";
                 let pageInfo = type === 'wifi' ? "#wifiPageInfo" : "#bluetoothPageInfo";
                 let prevBtn = type === 'wifi' ? "#prevWifi" : "#prevBluetooth";
@@ -221,11 +229,7 @@
                     return;
                 }
 
-                console.log(`Sorting ${type} by ${column} in ${order} order`);
-
-                document.querySelectorAll('.sort-icon').forEach(el => el.textContent = "⬍");
-                icon.textContent = order === "desc" ? "⬆" : "⬇";
-                loadTable(type, type === 'wifi' ? wifiPage : bluetoothPage, column, order);
+                loadTable(type, type === 'wifi' ? wifiPage : bluetoothPage, column, order, icon);
             });
 
 

@@ -33,6 +33,7 @@
                                 <p><strong>Address:</strong> {{ $device->address }}</p>
                                 <p><strong>Manufacturer:</strong> {{ $device->manufacturer }}</p>
                                 <p><strong>RSSI:</strong> {{ $device->rssi }}</p>
+                                <p><strong>Timestamp:</strong> {{ $device->updated_at }}</p>
                             </div>
                         @endforeach
                     @endif
@@ -61,6 +62,7 @@
                                 <p><strong>BSSID:</strong> {{ $device->bssid }}</p>
                                 <p><strong>Frequency:</strong> {{ $device->frequency }}</p>
                                 <p><strong>RSSI:</strong> {{ $device->rssi }}</p>
+                                <p><strong>Timestamp:</strong> {{ $device->updated_at }}</p>
                             </div>
                         @endforeach
                     @endif
