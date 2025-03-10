@@ -154,6 +154,10 @@ class WifiController extends Controller
             });
         }
 
+        if ($request->start_date && $request->end_date) {
+            $query->whereBetween('wifi.updated_at', [$request->start_date, $request->end_date]);
+        }
+
         if (in_array($sortColumn, ['bssid', 'ssid', 'frequency', 'rssi', 'updated_at', 'created_at'])) {
             $query->orderBy("wifi.$sortColumn", $sortOrder);
         } elseif (in_array($sortColumn, ['device_name', 'device_manufacturer', 'device_brand'])) {
