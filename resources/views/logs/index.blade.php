@@ -8,6 +8,10 @@
         <h2 class="text-xl font-semibold mb-2 text-gray-700">WiFi Transmitters</h2>
         <div class="flex flex-col sm:flex-row sm:justify-between">
             <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <div class="flex gap-2 items-center">
+                    <input type="text" id="wifiDateRange" placeholder="Date Range.."
+                        class="w-full sm:w-64 h-full border border-[#ccc] p-2 rounded" readonly>
+                </div>
                 <div class="custom-select-wrapper">
                     <select id="wifiDeviceName" class="custom-select">
                         <option value="">All Device Names</option>
@@ -22,10 +26,6 @@
                     <select id="wifiSSID" class="w-full custom-select">
                         <option value="">All SSID</option>
                     </select>
-                </div>
-                <div class="flex gap-2 items-center">
-                    <input type="text" id="wifiDateRange" placeholder="Date Range.."
-                        class="w-full sm:w-64 h-full border border-[#ccc] p-2 rounded" readonly>
                 </div>
             </div>
             <div>
@@ -73,6 +73,10 @@
         <h2 class="text-xl font-semibold mt-8 mb-2 text-gray-700">Bluetooth Transmitters</h2>
         <div class="flex flex-col sm:flex-row sm:justify-between">
             <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <div class="flex gap-2 items-center">
+                    <input type="text" id="bluetoothDateRange" placeholder="Date Range.."
+                        class="w-full sm:w-64 h-full border border-[#ccc] p-2 rounded" readonly>
+                </div>
                 <div class="custom-select-wrapper">
                     <select id="bluetoothDeviceName" class="custom-select">
                         <option value="">All Device Names</option>
@@ -82,10 +86,6 @@
                     <select id="bluetoothManufacturer" class="custom-select">
                         <option value="">All Manufacturers</option>
                     </select>
-                </div>
-                <div class="flex gap-2 items-center">
-                    <input type="text" id="bluetoothDateRange" placeholder="Date Range.."
-                        class="w-full sm:w-64 h-full border border-[#ccc] p-2 rounded" readonly>
                 </div>
             </div>
             <div>
