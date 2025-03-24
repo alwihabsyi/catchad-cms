@@ -23,23 +23,27 @@ class BluetoothController extends Controller
     {
         try {
             $validated = $request->validate([
-                'address' => 'required|string|unique:bluetooth,address',
+                'address' => 'required|string',
                 'name' => 'nullable|string',
                 'manufacturer' => 'required|string',
                 'rssi' => 'required|integer',
                 'device_id' => 'required|string|exists:devices,id',
             ]);
 
-            $bluetooth = Bluetooth::create([
-                'address' => $validated['address'],
-                'name' => $validated['name'],
-                'manufacturer' => $validated['manufacturer'],
-                'rssi' => $validated['rssi'],
-                'device_id' => $validated['device_id'],
-            ]);
+            $bluetooth = Bluetooth::updateOrCreate(
+                ['address' => $validated['address']],
+                [
+                    'name' => $validated['name'],
+                    'manufacturer' => $validated['manufacturer'],
+                    'rssi' => $validated['rssi'],
+                    'device_id' => $validated['device_id'],
+                ]
+            );
 
             return response()->json([
-                'message' => 'Bluetooth record created successfully!',
+                'message' => $bluetooth->wasRecentlyCreated
+                    ? 'Bluetooth record created successfully!'
+                    : 'Bluetooth record updated successfully!',
                 'bluetooth' => $bluetooth
             ], 201);
         } catch (\Illuminate\Database\QueryException $e) {

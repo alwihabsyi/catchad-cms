@@ -23,23 +23,27 @@ class WifiController extends Controller
     {
         try {
             $validated = $request->validate([
-                'bssid' => 'required|string|unique:wifi,bssid',
+                'bssid' => 'required|string',
                 'ssid' => 'nullable|string',
                 'frequency' => 'required|integer',
                 'rssi' => 'required|integer',
                 'device_id' => 'required|string|exists:devices,id',
             ]);
 
-            $wifi = Wifi::create([
-                'bssid' => $validated['bssid'],
-                'ssid' => $validated['ssid'] ?? 'unknown',
-                'frequency' => $validated['frequency'],
-                'rssi' => $validated['rssi'],
-                'device_id' => $validated['device_id'],
-            ]);
+            $wifi = Wifi::updateOrCreate(
+                ['bssid' => $validated['bssid']],
+                [
+                    'ssid' => $validated['ssid'] ?? 'unknown',
+                    'frequency' => $validated['frequency'],
+                    'rssi' => $validated['rssi'],
+                    'device_id' => $validated['device_id'],
+                ]
+            );
 
             return response()->json([
-                'message' => 'Wifi record created successfully!',
+                'message' => $wifi->wasRecentlyCreated
+                    ? 'Wifi record created successfully!'
+                    : 'Wifi record updated successfully!',
                 'wifi' => $wifi
             ], 201);
         } catch (\Illuminate\Database\QueryException $e) {
